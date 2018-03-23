@@ -50,18 +50,7 @@ public class Practice4 {
      *
      */
     public Observable<String> runInMultiThread(Observable<String> observable) {
-        return observable.concatMap(new Function<String, ObservableSource<? extends String>>() {
-            @Override
-            public ObservableSource<? extends String> apply(@NonNull String s) throws Exception {
-                return Observable.create(new ObservableOnSubscribe<String>() {
-                    @Override
-                    public void subscribe(@NonNull ObservableEmitter<String> emitter) throws Exception {
-                        emitter.onNext(s);
-                        emitter.onComplete();
-                    }
-                }).observeOn(Schedulers.newThread());
-            }
-        });
+        return  observable.concatMap(s -> Observable.just(s).observeOn(Schedulers.newThread()));
     }
 
 }

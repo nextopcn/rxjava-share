@@ -34,7 +34,7 @@ public class Practice1 {
      * 返回值 Observable[(1, "a"), (2, "b"), (3, "c")] 注意index从1开始
      */
     public Observable<Tuple2<Integer, String>> indexable(Observable<String> observable) {
-        return  this.method1(observable);
+        return  this.method3(observable);
     }
 
     private Observable<Tuple2<Integer, String>> method1(Observable<String> source) {
@@ -51,11 +51,18 @@ public class Practice1 {
         });
     }
 
-//    private Observable<Tuple2<Integer, String>> method2(Observable<String> source) {
-//        return source.<Tuple2<Integer, String>>map(x -> new Tuple2(1, x))
-//                .<Tuple2<Integer, String>>scan((tuple2, s) -> {
-//                    return new Tuple2<Integer, String>(new Integer(1), "");
-//        });
-//    }
+    private Observable<Tuple2<Integer, String>> method2(Observable<String> source) {
+        return source.map(x -> new Tuple2<Integer, String>(1, x))
+                .scan((t, s) -> new Tuple2(t.getV1().intValue() + 1, s.getV2()));
+    }
+
+    private Observable<Tuple2<Integer, String>> method3(Observable<String> source) {
+//        Observable.zip
+        return source.zipWith(Observable.range(1, Integer.MAX_VALUE), (o1, o2) -> {
+            return new Tuple2<Integer, String>(o2, o1);
+        });
+    }
+
+
 
 }

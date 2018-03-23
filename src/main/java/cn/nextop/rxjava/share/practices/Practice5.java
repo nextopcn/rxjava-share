@@ -60,12 +60,10 @@ public class Practice5 {
      * return: Observable["a", "b", "c"]
      */
     public Observable<String> distinct(Observable<String> source) {
-        return source.groupBy(s -> s).flatMap(g -> {
-            return Observable.create(emitter -> {
-                emitter.onNext(g.getKey());
-                emitter.onComplete();
-            });
-        });
+//        return source.groupBy(s -> s).flatMap(g -> {
+//            return Observable.<String>just(g.getKey());
+//        });
+        return source.groupBy(s -> s).map(s -> s.getKey());
     }
 
     /*
@@ -74,12 +72,9 @@ public class Practice5 {
      * return: Observable[3, 4]
      */
     public Observable<Integer> filter(Observable<Integer> source, Predicate<Integer> conditon) {
-        List<Integer> list = new ArrayList<Integer>();
-        return source.reduce(list, (c, i) -> {
-            if (conditon.test(i)) c.add(i);
-            return c;
-        }).toObservable().flatMap(s -> {
-            return Observable.fromIterable(s);
+        return source.flatMap(s -> {
+            if (conditon.test(s)) return Observable.just(s);
+            return Observable.empty();
         });
     }
 
@@ -89,13 +84,13 @@ public class Practice5 {
      * return: Maybe[3]
      */
     public Maybe<String> elementAt(Observable<String> source, int index) {
-        AtomicInteger cursor = new AtomicInteger(0);
-        return source.reduce((seed, s) -> {
-            if (cursor.incrementAndGet() == index) {
-                return s;
-            }
-            return seed;
-        });
+//        source.skip(index).take(1).firstElement();
+        return source.take(index + 1).lastElement();
+//        AtomicInteger cursor = new AtomicInteger(0);
+//        return source.reduce((seed, s) -> {
+//            if (cursor.incrementAndGet() == index) return s;
+//            return seed;
+//        });
     }
 
     /*

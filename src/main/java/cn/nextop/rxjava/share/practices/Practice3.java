@@ -55,10 +55,8 @@ public class Practice3 {
 
     private Iterable<Integer> iterator(Node node) {
         class Iter implements Iterator<Integer> {
-            private Node root;
             private Stack<Node> stack = new Stack<>();
             Iter(Node node) {
-                Node curr = node;
                 this.walk(node);
             }
 
