@@ -22,6 +22,7 @@ import io.reactivex.Observable;
 import io.reactivex.Single;
 
 import java.util.Map;
+import java.util.HashMap;
 
 /**
  * @author Baoyi Chen
@@ -34,7 +35,14 @@ public class Practice2 {
      * 返回: Observable[("a", 2), ("b", 1), ("c", 2)]
      */
     public Observable<Tuple2<String, Integer>> wordCount1(Observable<String> words) {
-        throw new UnsupportedOperationException("implementation");
+    	Observable<String> distring = words.distinct();
+    	return distring.map(e -> {
+    		Integer t = words.filter(s -> {
+    			return e == s;
+    		}).count().blockingGet().intValue();
+    		return new Tuple2<String, Integer>(e,t);
+    	});
+    	
     }
 
     /*
@@ -43,7 +51,14 @@ public class Practice2 {
      * 返回: Single[Map{a=2, b=1, c=2}]
      */
     public Single<Map<String, Integer>> wordCount2(Observable<String> words) {
-        throw new UnsupportedOperationException("implementation");
+    	return words.reduce(new HashMap<String, Integer>(),(initial,str2) ->  {
+    		if(!initial.containsKey(str2)) {
+    			initial.put(str2, 1);
+    		} else {
+    			initial.put(str2, initial.get(str2) + 1);
+    		}
+    		return initial;
+    	});
     }
 
 }
