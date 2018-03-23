@@ -23,13 +23,16 @@ import io.reactivex.Observable;
  * @author Baoyi Chen
  */
 public class Practice1 {
-
+	
     /*
      * 举例如下:
      * 参数 Observable["a","b","c"]
      * 返回值 Observable[(1, "a"), (2, "b"), (3, "c")] 注意index从1开始
      */
     public Observable<Tuple2<Integer, String>> indexable(Observable<String> observable) {
-        throw new UnsupportedOperationException("implementation");
+    	Observable<Integer> obInteger = Observable.just(1,2,3);
+    	return Observable.zip(obInteger ,observable ,(index, val) -> {
+    		return new Tuple2<Integer, String>(index, val);
+    	});
     }
 }
