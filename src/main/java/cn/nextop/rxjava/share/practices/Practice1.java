@@ -16,6 +16,8 @@
 
 package cn.nextop.rxjava.share.practices;
 
+import java.util.concurrent.atomic.AtomicInteger;
+
 import cn.nextop.rxjava.share.util.type.Tuple2;
 import io.reactivex.Observable;
 
@@ -30,6 +32,9 @@ public class Practice1 {
      * 返回值 Observable[(1, "a"), (2, "b"), (3, "c")] 注意index从1开始
      */
     public Observable<Tuple2<Integer, String>> indexable(Observable<String> observable) {
-        throw new UnsupportedOperationException("implementation");
+//        // Wrong
+//        return observable.map( e -> { return new Tuple2<>(e.charAt(0) - "a".charAt(0) + 1, e); }  );
+        AtomicInteger a = new AtomicInteger(0);
+        return observable.map( e -> { int index = a.addAndGet(1); return new Tuple2<>(index, e); }  );
     }
 }
