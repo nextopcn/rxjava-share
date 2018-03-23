@@ -16,12 +16,19 @@
 
 package cn.nextop.rxjava.share.practices;
 
-import io.reactivex.Maybe;
-import io.reactivex.Observable;
-import io.reactivex.Single;
+import io.reactivex.*;
+import io.reactivex.annotations.NonNull;
+import io.reactivex.functions.Function;
+import io.reactivex.observables.GroupedObservable;
+import io.reactivex.subjects.PublishSubject;
+import io.reactivex.subjects.Subject;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Predicate;
 
 /**
@@ -35,7 +42,7 @@ public class Practice5 {
      * return: Single[3]
      */
     public Single<Long> count(Observable<String> source) {
-        throw new UnsupportedOperationException("implementation");
+        return source.reduce(0L, (i, s) -> i+1);
     }
 
     /*
@@ -44,7 +51,7 @@ public class Practice5 {
      * return: Observable["a", "b", "c","b", "c", "d"]
      */
     public Observable<String> convert(Observable<List<String>> source) {
-        throw new UnsupportedOperationException("implementation");
+        return source.flatMap(s -> Observable.fromIterable(s));
     }
 
     /*
@@ -53,7 +60,12 @@ public class Practice5 {
      * return: Observable["a", "b", "c"]
      */
     public Observable<String> distinct(Observable<String> source) {
-        throw new UnsupportedOperationException("implementation");
+        return source.groupBy(s -> s).flatMap(g -> {
+            return Observable.create(emitter -> {
+                emitter.onNext(g.getKey());
+                emitter.onComplete();
+            });
+        });
     }
 
     /*
@@ -62,7 +74,13 @@ public class Practice5 {
      * return: Observable[3, 4]
      */
     public Observable<Integer> filter(Observable<Integer> source, Predicate<Integer> conditon) {
-        throw new UnsupportedOperationException("implementation");
+        List<Integer> list = new ArrayList<Integer>();
+        return source.reduce(list, (c, i) -> {
+            if (conditon.test(i)) c.add(i);
+            return c;
+        }).toObservable().flatMap(s -> {
+            return Observable.fromIterable(s);
+        });
     }
 
     /*
@@ -71,7 +89,13 @@ public class Practice5 {
      * return: Maybe[3]
      */
     public Maybe<String> elementAt(Observable<String> source, int index) {
-        throw new UnsupportedOperationException("implementation");
+        AtomicInteger cursor = new AtomicInteger(0);
+        return source.reduce((seed, s) -> {
+            if (cursor.incrementAndGet() == index) {
+                return s;
+            }
+            return seed;
+        });
     }
 
     /*
@@ -80,7 +104,7 @@ public class Practice5 {
      * return: Observable["a", "b", "a", "b"]
      */
     public Observable<String> repeat(Observable<String> source, int count) {
-        throw new UnsupportedOperationException("implementation");
+        return Observable.range(0, count).flatMap(s -> source);
     }
 
     /*
@@ -89,7 +113,7 @@ public class Practice5 {
      * return: Observable["a", "b"]
      */
     public Observable<String> concat(List<Observable<String>> source) {
-        throw new UnsupportedOperationException("implementation");
+        return Observable.fromIterable(source).concatMap(s -> s);
     }
 
     /*
@@ -98,7 +122,7 @@ public class Practice5 {
      * return: Observable["a", "b"]
      */
     public Observable<String> merge(List<Observable<String>> source) {
-        throw new UnsupportedOperationException("implementation");
+        return Observable.fromIterable(source).flatMap(s -> s);
     }
 
     /*
@@ -107,7 +131,9 @@ public class Practice5 {
      * return: Observable["a", "b", "c"], 每个元素都延迟1秒
      */
     public Observable<String> delayAll(Observable<String> source, long delay, TimeUnit unit) {
-        throw new UnsupportedOperationException("implementation");
+        return source.concatMap(s -> {
+            return Observable.just(s).delay(delay, unit);
+        });
     }
 
 }
