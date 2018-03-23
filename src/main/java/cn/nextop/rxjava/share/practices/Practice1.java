@@ -16,6 +16,7 @@
 
 package cn.nextop.rxjava.share.practices;
 
+import cn.nextop.rxjava.share.util.Lists;
 import cn.nextop.rxjava.share.util.type.Tuple2;
 import io.reactivex.Observable;
 
@@ -30,6 +31,13 @@ public class Practice1 {
      * 返回值 Observable[(1, "a"), (2, "b"), (3, "c")] 注意index从1开始
      */
     public Observable<Tuple2<Integer, String>> indexable(Observable<String> observable) {
-        throw new UnsupportedOperationException("implementation");
+        Observable.fromIterable(Lists.of("a", "b", "c")).subscribe(System.out::println);
+
+        return observable.map(s -> {
+            return new Tuple2<Integer, String>(1,s);
+        })
+        .scan((acc, t) -> {
+            return new Tuple2<Integer, String>(acc.getV1()+1, t.getV2());
+        });
     }
 }
