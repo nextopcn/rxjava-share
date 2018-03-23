@@ -30,7 +30,10 @@ public class Practice1 {
      * 返回值 Observable[(1, "a"), (2, "b"), (3, "c")] 注意index从1开始
      */
     public Observable<Tuple2<Integer, String>> indexable(Observable<String> observable) {
-    	Observable<Integer> obInteger = Observable.just(1,2,3);
+    	
+    	Observable<Integer> obInteger = observable.scan(1, (initial,x) -> {
+    		return initial + 1 ;
+    	});
     	return Observable.zip(obInteger ,observable ,(index, val) -> {
     		return new Tuple2<Integer, String>(index, val);
     	});

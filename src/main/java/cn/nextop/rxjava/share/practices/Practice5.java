@@ -24,6 +24,7 @@ import io.reactivex.Single;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Predicate;
+import java.util.HashMap;
 
 /**
  * @author Baoyi Chen
@@ -36,7 +37,9 @@ public class Practice5 {
      * return: Single[3]
      */
     public Single<Long> count(Observable<String> source) {
-    	return source.count();
+    	return source.reduce(new Long(0), (initial,str1) -> {
+    		return initial + 1;
+    	});
     }
 
     /*
@@ -55,7 +58,10 @@ public class Practice5 {
      * return: Observable["a", "b", "c"]
      */
     public Observable<String> distinct(Observable<String> source) {
-    	return source.distinct();
+        return source.groupBy(e -> {
+        	return e;
+        }).map(e -> e.getKey());
+    	
     }
 
     /*
@@ -75,7 +81,7 @@ public class Practice5 {
      * return: Maybe[3]
      */
     public Maybe<String> elementAt(Observable<String> source, int index) {
-    	return source.elementAt(index);
+    	return source.skip(index).take(1).firstElement();
     }
 
     /*
@@ -84,7 +90,9 @@ public class Practice5 {
      * return: Observable["a", "b", "a", "b"]
      */
     public Observable<String> repeat(Observable<String> source, int count) {
-    	return source.repeat(count);
+    	return Observable.range(0, count).map(e -> {
+    		return source;
+    	}).concatMap(e -> e);
     }
 
     /*
@@ -93,7 +101,7 @@ public class Practice5 {
      * return: Observable["a", "b"]
      */
     public Observable<String> concat(List<Observable<String>> source) {
-    	return Observable.concat(source);
+    	return Observable.fromIterable(source).concatMap(e -> e);
     }
 
     /*
@@ -102,7 +110,7 @@ public class Practice5 {
      * return: Observable["a", "b"]
      */
     public Observable<String> merge(List<Observable<String>> source) {
-    	return Observable.merge(source);
+    	return Observable.fromIterable(source).flatMap(e->e);
     }
 
     /*
