@@ -19,6 +19,11 @@ package cn.nextop.rxjava.share.practices;
 import io.reactivex.Maybe;
 import io.reactivex.Observable;
 
+import java.util.Iterator;
+import java.util.NoSuchElementException;
+import java.util.Stack;
+
+
 /**
  * @author Baoyi Chen
  */
@@ -28,7 +33,7 @@ public class Practice3 {
      * 根据iterate的结果求和
      */
     public Maybe<Integer> sum(Observable<Node> observable) {
-        throw new UnsupportedOperationException("implementation");
+        return this.iterate(observable).reduce(0, (s, i) -> s += i).toMaybe();
     }
 
     /*
@@ -42,7 +47,41 @@ public class Practice3 {
      * return Observable[4, 3, 6, 7, 5] 顺序无关
      */
     public Observable<Integer> iterate(Observable<Node> observable) {
-        throw new UnsupportedOperationException("implementation");
+        // flatMap no map
+        return observable.flatMap(s -> {
+            return Observable.fromIterable(iterator(s));
+        });
+    }
+
+    private Iterable<Integer> iterator(Node node) {
+        class Iter implements Iterator<Integer> {
+            private Stack<Node> stack = new Stack<>();
+            Iter(Node node) {
+                this.walk(node);
+            }
+
+            private Node walk(Node node) {
+                this.stack.push(node);
+                if (node.left != null) {
+                    this.walk(node.left);
+                }
+                if (node.right != null) {
+                    walk(node.right);
+                }
+                return null;
+            }
+            @Override
+            public boolean hasNext() {
+                return this.stack.size() > 0;
+            }
+
+            @Override
+            public Integer next() {
+                Node curr = this.stack.pop();
+                return curr.value;
+            }
+        }
+        return node == null ? null : () -> new Iter(node);
     }
 
     public static class Node {
