@@ -16,12 +16,13 @@
 
 package cn.nextop.rxjava.share.practices;
 
-import io.reactivex.Maybe;
-import io.reactivex.Observable;
-import io.reactivex.Single;
+import cn.nextop.rxjava.share.util.type.Tuple2;
+import io.reactivex.*;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Predicate;
 
 /**
@@ -35,7 +36,13 @@ public class Practice5 {
      * return: Single[3]
      */
     public Single<Long> count(Observable<String> source) {
-        throw new UnsupportedOperationException("implementation");
+        return Single.create(singleEmitter ->
+                source.map(s -> 1)
+                        .scan((acc, value) -> acc + 1)
+                        .lastElement()
+                        .subscribe(integer -> {
+                            singleEmitter.onSuccess((long) integer);
+                        }));
     }
 
     /*
@@ -44,7 +51,13 @@ public class Practice5 {
      * return: Observable["a", "b", "c","b", "c", "d"]
      */
     public Observable<String> convert(Observable<List<String>> source) {
-        throw new UnsupportedOperationException("implementation");
+        return Observable.create(observableEmitter ->
+                source.doOnComplete(() -> observableEmitter.onComplete())
+                        .subscribe(strings -> {
+                            for (String s : strings) {
+                                observableEmitter.onNext(s);
+                            }
+                        }));
     }
 
     /*
@@ -53,7 +66,19 @@ public class Practice5 {
      * return: Observable["a", "b", "c"]
      */
     public Observable<String> distinct(Observable<String> source) {
-        throw new UnsupportedOperationException("implementation");
+        return Observable.create(observableEmitter -> {
+            ArrayList<String> list = new ArrayList();
+            source.doOnComplete(() -> {
+                for (String s : list) {
+                    observableEmitter.onNext(s);
+                }
+                observableEmitter.onComplete();
+            }).subscribe(s -> {
+                if (!list.contains(s)) {
+                    list.add(s);
+                }
+            });
+        });
     }
 
     /*
@@ -62,7 +87,19 @@ public class Practice5 {
      * return: Observable[3, 4]
      */
     public Observable<Integer> filter(Observable<Integer> source, Predicate<Integer> conditon) {
-        throw new UnsupportedOperationException("implementation");
+        return Observable.create(observableEmitter -> {
+            ArrayList<Integer> list = new ArrayList();
+            source.doOnComplete(() -> {
+                for (Integer i : list) {
+                    observableEmitter.onNext(i);
+                }
+                observableEmitter.onComplete();
+            }).subscribe(i -> {
+                if (conditon.test(i)) {
+                    list.add(i);
+                }
+            });
+        });
     }
 
     /*
@@ -71,7 +108,14 @@ public class Practice5 {
      * return: Maybe[3]
      */
     public Maybe<String> elementAt(Observable<String> source, int index) {
-        throw new UnsupportedOperationException("implementation");
+        return Maybe.create(maybeEmitter ->
+                source.map(s -> new Tuple2<>(0, s))
+                        .scan((acc, value) -> new Tuple2<>(acc.getV1() + 1, value.getV2()))
+                        .subscribe(tuple2 -> {
+                            if (tuple2.getV1() == index) {
+                                maybeEmitter.onSuccess(tuple2.getV2());
+                            }
+                        }));
     }
 
     /*
@@ -80,7 +124,11 @@ public class Practice5 {
      * return: Observable["a", "b", "a", "b"]
      */
     public Observable<String> repeat(Observable<String> source, int count) {
-        throw new UnsupportedOperationException("implementation");
+        ArrayList<Observable<String>> list = new ArrayList();
+        for (int i = 0; i < count; i++) {
+            list.add(source);
+        }
+        return Observable.concat(list);
     }
 
     /*
@@ -89,7 +137,21 @@ public class Practice5 {
      * return: Observable["a", "b"]
      */
     public Observable<String> concat(List<Observable<String>> source) {
-        throw new UnsupportedOperationException("implementation");
+        AtomicInteger index = new AtomicInteger();
+        return Observable.create(observableEmitter ->
+                    doConcat(source,index,observableEmitter));
+    }
+
+    private void doConcat(List<Observable<String>> source, AtomicInteger index, ObservableEmitter<String> emitter) {
+        source.get(index.getAndIncrement())
+                .doOnComplete(() -> {
+                    if (index.get() >= source.size()) {
+                        emitter.onComplete();
+                    } else {
+                        doConcat(source, index, emitter);
+                    }
+                }).subscribe(string -> emitter.onNext(string));
+
     }
 
     /*
@@ -98,7 +160,15 @@ public class Practice5 {
      * return: Observable["a", "b"]
      */
     public Observable<String> merge(List<Observable<String>> source) {
-        throw new UnsupportedOperationException("implementation");
+        int size = source.size();
+        AtomicInteger index = new AtomicInteger();
+        return Observable.create(observableEmitter ->
+                Observable.fromIterable(source)
+                        .subscribe(stringObservable -> stringObservable.doOnComplete(() -> {
+                            if (index.incrementAndGet() == size) {
+                                observableEmitter.onComplete();
+                            }
+                        }).subscribe(string -> observableEmitter.onNext(string))));
     }
 
     /*
@@ -107,7 +177,12 @@ public class Practice5 {
      * return: Observable["a", "b", "c"], 每个元素都延迟1秒
      */
     public Observable<String> delayAll(Observable<String> source, long delay, TimeUnit unit) {
-        throw new UnsupportedOperationException("implementation");
+        return Observable.create(observableEmitter ->
+                source.doOnComplete(() -> observableEmitter.onComplete())
+                        .subscribe(s -> {
+                            Thread.sleep(1000);
+                            observableEmitter.onNext(s);
+                        }));
     }
 
 }

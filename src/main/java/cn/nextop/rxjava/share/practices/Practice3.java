@@ -16,19 +16,42 @@
 
 package cn.nextop.rxjava.share.practices;
 
-import io.reactivex.Maybe;
-import io.reactivex.Observable;
+import io.reactivex.*;
+import io.reactivex.functions.Action;
+import io.reactivex.functions.BiFunction;
+import io.reactivex.functions.Consumer;
+import io.reactivex.functions.Function;
+
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * @author Baoyi Chen
  */
 public class Practice3 {
 
+    private Observable<Integer> nodes(Node left, Node right, Integer value) {
+        if (left != null && right != null) {
+            return Observable.just(left, right, new Node(null, null, value)).flatMap((Function<Node, ObservableSource<Integer>>) node1 -> nodes(node1.left, node1.right, node1.value));
+        } else if (left != null) {
+            return Observable.just(left, new Node(null, null, value)).flatMap((Function<Node, ObservableSource<Integer>>) node1 -> nodes(node1.left, node1.right, node1.value));
+        } else if (right != null) {
+            return Observable.just(right, new Node(null, null, value)).flatMap((Function<Node, ObservableSource<Integer>>) node1 -> nodes(node1.left, node1.right, node1.value));
+        } else {
+            return Observable.just(value);
+        }
+    }
+
     /*
      * 根据iterate的结果求和
      */
     public Maybe<Integer> sum(Observable<Node> observable) {
-        throw new UnsupportedOperationException("implementation");
+        return Maybe.create(maybeEmitter ->
+                observable
+                        .flatMap((Function<Node, ObservableSource<Integer>>) node -> nodes(node.left, node.right, node.value))
+                        .scan((integer, integer2) -> integer + integer2)
+                        .lastElement()
+                        .subscribe(value -> maybeEmitter.onSuccess(value))
+        );
     }
 
     /*
@@ -42,7 +65,12 @@ public class Practice3 {
      * return Observable[4, 3, 6, 7, 5] 顺序无关
      */
     public Observable<Integer> iterate(Observable<Node> observable) {
-        throw new UnsupportedOperationException("implementation");
+        return Observable.create(maybeEmitter ->
+                observable
+                        .doOnComplete(() -> maybeEmitter.onComplete())
+                        .flatMap((Function<Node, ObservableSource<Integer>>) node -> nodes(node.left, node.right, node.value))
+                        .subscribe(value -> maybeEmitter.onNext(value))
+        );
     }
 
     public static class Node {

@@ -18,9 +18,10 @@ package cn.nextop.rxjava.share.practices;
 
 
 import cn.nextop.rxjava.share.util.type.Tuple2;
-import io.reactivex.Observable;
-import io.reactivex.Single;
+import io.reactivex.*;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -34,7 +35,27 @@ public class Practice2 {
      * 返回: Observable[("a", 2), ("b", 1), ("c", 2)]
      */
     public Observable<Tuple2<String, Integer>> wordCount1(Observable<String> words) {
-        throw new UnsupportedOperationException("implementation");
+
+        return Observable.create(emitter -> {
+            ArrayList<Tuple2<String, Integer>> list = new ArrayList();
+            words.doOnComplete(() -> {
+                for (Tuple2<String, Integer> tuple2 : list) {
+                    emitter.onNext(tuple2);
+                }
+                emitter.onComplete();
+            }).subscribe(s -> {
+                int value = 1;
+                for (Tuple2<String, Integer> tuple2 : list) {
+                    if (tuple2.getV1().equals(s)) {
+                        list.remove(tuple2);
+                        value = tuple2.getV2() + 1;
+                        break;
+                    }
+                }
+                list.add(new Tuple2<>(s, value));
+            });
+
+        });
     }
 
     /*
@@ -43,7 +64,14 @@ public class Practice2 {
      * 返回: Single[Map{a=2, b=1, c=2}]
      */
     public Single<Map<String, Integer>> wordCount2(Observable<String> words) {
-        throw new UnsupportedOperationException("implementation");
+        return Single.create(singleEmitter -> {
+            HashMap<String, Integer> map = new HashMap<>();
+            words.doOnComplete(() -> singleEmitter.onSuccess(map))
+                    .subscribe(s -> {
+                        Integer i = map.get(s);
+                        map.put(s, i == null ? 1 : i++);
+                    });
+        });
     }
 
 }

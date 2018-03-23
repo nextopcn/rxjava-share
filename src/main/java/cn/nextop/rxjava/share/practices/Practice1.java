@@ -30,6 +30,6 @@ public class Practice1 {
      * 返回值 Observable[(1, "a"), (2, "b"), (3, "c")] 注意index从1开始
      */
     public Observable<Tuple2<Integer, String>> indexable(Observable<String> observable) {
-        throw new UnsupportedOperationException("implementation");
+        return observable.map(s -> new Tuple2<>(1, s)).scan((acc, value) -> new Tuple2<>(acc.getV1() + 1, value.getV2()));
     }
 }
