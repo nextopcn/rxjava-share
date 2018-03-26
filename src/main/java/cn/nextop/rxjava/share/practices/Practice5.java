@@ -16,8 +16,6 @@
 
 package cn.nextop.rxjava.share.practices;
 
-import com.sun.xml.internal.xsom.impl.scd.Iterators;
-
 import cn.nextop.rxjava.share.util.type.Tuple2;
 import io.reactivex.Maybe;
 import io.reactivex.Observable;
