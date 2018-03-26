@@ -34,7 +34,11 @@ public class Practice1 {
     public Observable<Tuple2<Integer, String>> indexable(Observable<String> observable) {
 //        // Wrong
 //        return observable.map( e -> { return new Tuple2<>(e.charAt(0) - "a".charAt(0) + 1, e); }  );
-        AtomicInteger a = new AtomicInteger(0);
-        return observable.map( e -> { int index = a.addAndGet(1); return new Tuple2<>(index, e); }  );
+
+//        // Bad, has side effect
+//        AtomicInteger a = new AtomicInteger(0);
+//        return observable.map( e -> { int index = a.addAndGet(1); return new Tuple2<>(index, e); }  );
+
+        return observable.map(e -> new Tuple2<Integer, String>(1, e)).scan( (pre, cur) -> new Tuple2<Integer, String>(pre.getV1() + 1, cur.getV2()));
     }
 }
