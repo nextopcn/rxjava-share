@@ -17,7 +17,6 @@
 package cn.nextop.rxjava.share.practices;
 
 
-import cn.nextop.rxjava.share.util.Maps;
 import cn.nextop.rxjava.share.util.type.Tuple2;
 import io.reactivex.Observable;
 import io.reactivex.Single;
@@ -48,18 +47,7 @@ public class Practice2 {
      * 返回: Single[Map{a=2, b=1, c=2}]
      */
     public Single<Map<String, Integer>> wordCount2(Observable<String> words) {
-        // TODO: confused ？
-        return words.reduce(new HashMap<>(), this::reduce);
-    }
-
-    protected Map<String, Integer> reduce(Map<String, Integer> map, String key) {
-        if (Maps.isEmpty(map))  {
-            map = new HashMap<>();
-        }
-
-        Integer i = map.get(key);
-        map.put(key, i == null ? 0 : i++);
-        return map;
+        return words.reduce(new HashMap<>(), (m, k) -> { m.put(k, m.containsKey(k) ? m.get(k) + 1 : 1); return m; });
     }
 
 }
