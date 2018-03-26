@@ -45,8 +45,7 @@ public class Practice4 {
      *
      */
     public Observable<String> runInMultiThread(Observable<String> observable) {
-        return Observable.create(observableEmitter -> observable.subscribe(s -> Observable.just(s).subscribeOn(Schedulers.newThread())
-                .subscribe(s1 -> observableEmitter.onNext(s1))));
+        return observable.flatMap(o-> Observable.just(o).subscribeOn(Schedulers.newThread()));
     }
 
 }
