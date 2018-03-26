@@ -16,13 +16,14 @@
 
 package cn.nextop.rxjava.share.practices;
 
-import io.reactivex.Maybe;
-import io.reactivex.Observable;
-import io.reactivex.Single;
-
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Predicate;
+
+import io.reactivex.Maybe;
+import io.reactivex.Observable;
+import io.reactivex.Single;
 
 /**
  * @author Baoyi Chen
@@ -35,7 +36,7 @@ public class Practice5 {
 	 * return: Single[3]
 	 */
 	public Single<Long> count(Observable<String> source) {
-		return source.count();
+		return source.reduce(0L, (x, y) -> x + 1L);
 	}
 
 	/*
@@ -53,7 +54,7 @@ public class Practice5 {
 	 * return: Observable["a", "b", "c"]
 	 */
 	public Observable<String> distinct(Observable<String> source) {
-		return source.distinct();
+		return source.groupBy(s -> s).map(g -> Observable.just(g.getKey())).flatMap(og -> og);
 	}
 
 	/*
@@ -62,7 +63,21 @@ public class Practice5 {
 	 * return: Observable[3, 4]
 	 */
 	public Observable<Integer> filter(Observable<Integer> source, Predicate<Integer> conditon) {
-		return source.filter(conditon::test);
+//		return source.map(s -> {
+//			if (conditon.test(s)) {
+//				return Observable.<Integer>just(s);
+//			} else {
+//				return Observable.<Integer>empty();
+//			}
+//		}).flatMap(o -> o);
+		return Observable.concat(source.map(s -> {
+			if (conditon.test(s)) {
+				return Observable.<Integer>just(s);
+			} else {
+				return Observable.<Integer>empty();
+			}
+		}));
+		
 	}
 
 	/*
@@ -71,16 +86,37 @@ public class Practice5 {
 	 * return: Maybe[3]
 	 */
 	public Maybe<String> elementAt(Observable<String> source, int index) {
-		return source.elementAt(index);
+		return source.filter(new Index(index)).firstElement();
 	}
-
+	
+	private class Index implements io.reactivex.functions.Predicate<String> {
+		private int i = 0;
+		private final int index;
+		
+		private Index(int index) {
+			this.index = index;
+		}
+		
+		@Override
+		public boolean test(String t) throws Exception {
+			if (i++ == index) {
+				return true;
+			}
+			return false;
+		}
+	}
+	
 	/*
 	 * example:
 	 * param: Observable["a", "b"] , count = 2
 	 * return: Observable["a", "b", "a", "b"]
 	 */
 	public Observable<String> repeat(Observable<String> source, int count) {
-		return source.repeat(count);
+		List<Observable<String>> list = new ArrayList<>();
+		for (int i = 0; i < count; i++) {
+			list.add(source);
+		}
+		return Observable.concat(list);
 	}
 
 	/*
@@ -89,16 +125,16 @@ public class Practice5 {
 	 * return: Observable["a", "b"]
 	 */
 	public Observable<String> concat(List<Observable<String>> source) {
-		return Observable.concat(source);
+		return Observable.fromIterable(source).concatMapDelayError(s -> s);
 	}
-
+	
 	/*
 	 * example:
 	 * param: Observable["a"], Observable["b"]
 	 * return: Observable["a", "b"]
 	 */
 	public Observable<String> merge(List<Observable<String>> source) {
-		return Observable.merge(source);
+		return Observable.fromIterable(source).flatMap(s -> s);
 	}
 
 	/*
