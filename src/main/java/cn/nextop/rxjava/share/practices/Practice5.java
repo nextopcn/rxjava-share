@@ -35,7 +35,7 @@ public class Practice5 {
      * return: Single[3]
      */
     public Single<Long> count(Observable<String> source) {
-        return source.count();
+        return source.reduce(Long.valueOf("0"), (a, b) -> a + 1);
     }
 
     /*
@@ -53,7 +53,7 @@ public class Practice5 {
      * return: Observable["a", "b", "c"]
      */
     public Observable<String> distinct(Observable<String> source) {
-        return source.distinct();
+        return source.groupBy(s -> s).map(e -> e.getKey());
     }
 
     /*
@@ -71,7 +71,7 @@ public class Practice5 {
      * return: Maybe[3]
      */
     public Maybe<String> elementAt(Observable<String> source, int index) {
-        return source.elementAt(index);
+    	return source.skip(index).take(1).firstElement();
     }
 
     /*
@@ -80,7 +80,7 @@ public class Practice5 {
      * return: Observable["a", "b", "a", "b"]
      */
     public Observable<String> repeat(Observable<String> source, int count) {
-        return source.repeat(count);
+        return Observable.range(0, count).concatMap(e -> source);
     }
 
     /*
@@ -89,7 +89,7 @@ public class Practice5 {
      * return: Observable["a", "b"]
      */
     public Observable<String> concat(List<Observable<String>> source) {
-        return Observable.concat(source);
+        return Observable.fromIterable(source).concatMap(s -> s);
     }
 
     /*
@@ -98,7 +98,7 @@ public class Practice5 {
      * return: Observable["a", "b"]
      */
     public Observable<String> merge(List<Observable<String>> source) {
-    	return Observable.merge(source);
+    	return Observable.fromIterable(source).flatMap(s -> s);
     }
 
     /*
