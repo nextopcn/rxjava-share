@@ -16,34 +16,45 @@
 
 package cn.nextop.rxjava.share.practices;
 
+import java.util.HashMap;
+import java.util.Map;
 
 import cn.nextop.rxjava.share.util.type.Tuple2;
 import io.reactivex.Observable;
 import io.reactivex.Single;
-
-import java.util.Map;
 
 /**
  * @author Baoyi Chen
  */
 public class Practice2 {
 
-    /*
-     * 举例:
-     * words = Observable["a", "a", "b", "c", "c"]
-     * 返回: Observable[("a", 2), ("b", 1), ("c", 2)]
-     */
-    public Observable<Tuple2<String, Integer>> wordCount1(Observable<String> words) {
-        throw new UnsupportedOperationException("implementation");
-    }
+	/*
+	 * 举例:
+	 * words = Observable["a", "a", "b", "c", "c"]
+	 * 返回: Observable[("a", 2), ("b", 1), ("c", 2)]
+	 */
+	public Observable<Tuple2<String, Integer>> wordCount1(Observable<String> words) {
+    	return words.groupBy(v -> v).map(gr -> {
+    		Observable<Tuple2<String, Integer>> map = gr.count().map(c -> new Tuple2<String, Integer>(gr.getKey(), c.intValue())).toObservable();
+			return map;
+    	}).flatMap(s -> s);
+	}
 
-    /*
-     * 举例:
-     * words = Observable["a", "a", "b", "c", "c"]
-     * 返回: Single[Map{a=2, b=1, c=2}]
-     */
-    public Single<Map<String, Integer>> wordCount2(Observable<String> words) {
-        throw new UnsupportedOperationException("implementation");
-    }
+	/*
+	 * 举例:
+	 * words = Observable["a", "a", "b", "c", "c"]
+	 * 返回: Single[Map{a=2, b=1, c=2}]
+	 */
+	public Single<Map<String, Integer>> wordCount2(Observable<String> words) {
+		return words.reduce(new HashMap<String, Integer>(), this::map);
+	}
 
+	private Map<String, Integer> map(Map<String, Integer> map, String s) {
+		Integer integer = map.get(s);
+		if (integer == null) {
+			integer = 0;
+		}
+		map.put(s, ++integer);
+		return map;
+	}
 }
