@@ -29,85 +29,88 @@ import java.util.function.Predicate;
  */
 public class Practice5 {
 
-    /*
-     * example:
-     * param: Observable["a","b","c"]
-     * return: Single[3]
-     */
-    public Single<Long> count(Observable<String> source) {
-        throw new UnsupportedOperationException("implementation");
-    }
+	/*
+	 * example:
+	 * param: Observable["a","b","c"]
+	 * return: Single[3]
+	 */
+	public Single<Long> count(Observable<String> source) {
+		return source.count();
+	}
 
-    /*
-     * example:
-     * param: Observable[["a", "b", "c"], ["b", "c", "d"]]
-     * return: Observable["a", "b", "c","b", "c", "d"]
-     */
-    public Observable<String> convert(Observable<List<String>> source) {
-        throw new UnsupportedOperationException("implementation");
-    }
+	/*
+	 * example:
+	 * param: Observable[["a", "b", "c"], ["b", "c", "d"]]
+	 * return: Observable["a", "b", "c","b", "c", "d"]
+	 */
+	public Observable<String> convert(Observable<List<String>> source) {
+		return source.flatMapIterable(l -> l);
+	}
 
-    /*
-     * example:
-     * param: Observable["a", "a", "b", "b", "c"]
-     * return: Observable["a", "b", "c"]
-     */
-    public Observable<String> distinct(Observable<String> source) {
-        throw new UnsupportedOperationException("implementation");
-    }
+	/*
+	 * example:
+	 * param: Observable["a", "a", "b", "b", "c"]
+	 * return: Observable["a", "b", "c"]
+	 */
+	public Observable<String> distinct(Observable<String> source) {
+		return source.distinct();
+	}
 
-    /*
-     * example:
-     * param: Observable[1, 2, 3, 4, 5] , conditon = x > 2 and x < 5
-     * return: Observable[3, 4]
-     */
-    public Observable<Integer> filter(Observable<Integer> source, Predicate<Integer> conditon) {
-        throw new UnsupportedOperationException("implementation");
-    }
+	/*
+	 * example:
+	 * param: Observable[1, 2, 3, 4, 5] , conditon = x > 2 and x < 5
+	 * return: Observable[3, 4]
+	 */
+	public Observable<Integer> filter(Observable<Integer> source, Predicate<Integer> conditon) {
+		return source.filter(conditon::test);
+	}
 
-    /*
-     * example:
-     * param: Observable[1, 2, 3, 4, 5] , index = 2
-     * return: Maybe[3]
-     */
-    public Maybe<String> elementAt(Observable<String> source, int index) {
-        throw new UnsupportedOperationException("implementation");
-    }
+	/*
+	 * example:
+	 * param: Observable[1, 2, 3, 4, 5] , index = 2
+	 * return: Maybe[3]
+	 */
+	public Maybe<String> elementAt(Observable<String> source, int index) {
+		return source.elementAt(index);
+	}
 
-    /*
-     * example:
-     * param: Observable["a", "b"] , count = 2
-     * return: Observable["a", "b", "a", "b"]
-     */
-    public Observable<String> repeat(Observable<String> source, int count) {
-        throw new UnsupportedOperationException("implementation");
-    }
+	/*
+	 * example:
+	 * param: Observable["a", "b"] , count = 2
+	 * return: Observable["a", "b", "a", "b"]
+	 */
+	public Observable<String> repeat(Observable<String> source, int count) {
+		return source.repeat(count);
+	}
 
-    /*
-     * example:
-     * param: Observable["a"], Observable["b"]
-     * return: Observable["a", "b"]
-     */
-    public Observable<String> concat(List<Observable<String>> source) {
-        throw new UnsupportedOperationException("implementation");
-    }
+	/*
+	 * example:
+	 * param: Observable["a"], Observable["b"]
+	 * return: Observable["a", "b"]
+	 */
+	public Observable<String> concat(List<Observable<String>> source) {
+		return Observable.concat(source);
+	}
 
-    /*
-     * example:
-     * param: Observable["a"], Observable["b"]
-     * return: Observable["a", "b"]
-     */
-    public Observable<String> merge(List<Observable<String>> source) {
-        throw new UnsupportedOperationException("implementation");
-    }
+	/*
+	 * example:
+	 * param: Observable["a"], Observable["b"]
+	 * return: Observable["a", "b"]
+	 */
+	public Observable<String> merge(List<Observable<String>> source) {
+		return Observable.merge(source);
+	}
 
-    /*
-     * example:
-     * param: Observable["a", "b", "c"], 1, SECONDS
-     * return: Observable["a", "b", "c"], 每个元素都延迟1秒
-     */
-    public Observable<String> delayAll(Observable<String> source, long delay, TimeUnit unit) {
-        throw new UnsupportedOperationException("implementation");
-    }
+	/*
+	 * example:
+	 * param: Observable["a", "b", "c"], 1, SECONDS
+	 * return: Observable["a", "b", "c"], 每个元素都延迟1秒
+	 */
+	public Observable<String> delayAll(Observable<String> source, long delay, TimeUnit unit) {
+		return source.map(t -> {
+			unit.sleep(delay);
+			return t;
+		});
+	}
 
 }
