@@ -18,8 +18,7 @@ package cn.nextop.rxjava.share.practices;
 
 
 import io.reactivex.Observable;
-
-
+import io.reactivex.schedulers.Schedulers;
 /**
  * @author Baoyi Chen
  */
@@ -30,21 +29,21 @@ public class Practice4 {
      * 参数observable = Observable["a", "b", "c"]
      * 参数observer在消费observable时，每个元素都在独立的线程
      *
-     *                                              thread 1   ---------------
-     *                                             |-----------|     ["a"]   |
-     *                                             |           ---------------
-     *                                             |
-     *  -------------------------    ----------    |thread 2   ---------------
-     *  |Observable["a","b","c"]|----|Observer|----|-----------|     ["b"]   |
-     *  -------------------------    ----------    |           ---------------
-     *                                             |
-     *                                             |thread 3   ---------------
-     *                                             |-----------|     ["c"]   |
-     *                                                         ---------------
+     *                                    thread 1   ---------------
+     *                                   |-----------|Observer["a"]|
+     *                                   |           ---------------
+     *                                   |
+     *  -------------------------        |thread 2   ---------------
+     *  |Observable["a","b","c"]|--------|-----------|Observer["b"]|
+     *  -------------------------        |           ---------------
+     *                                   |
+     *                                   |thread 3   ---------------
+     *                                   |-----------|Observer["c"]|
+     *                                               ---------------
      *
      */
-    public Observable<String> runInMultiThread(Observable<String> observable) {
-        throw new UnsupportedOperationException("implementation");
+	public Observable<String> runInMultiThread(Observable<String> observable) {
+		return observable.flatMap(e -> Observable.just(e).subscribeOn(Schedulers.io()));
     }
 
 }

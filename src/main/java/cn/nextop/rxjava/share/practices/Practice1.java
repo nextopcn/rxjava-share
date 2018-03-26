@@ -24,12 +24,13 @@ import io.reactivex.Observable;
  */
 public class Practice1 {
 
-    /*
-     * 举例如下:
-     * 参数 Observable["a","b","c"]
-     * 返回值 Observable[(1, "a"), (2, "b"), (3, "c")] 注意index从1开始
-     */
-    public Observable<Tuple2<Integer, String>> indexable(Observable<String> observable) {
-        throw new UnsupportedOperationException("implementation");
-    }
+	/*
+	 * 举例如下: 参数 Observable["a","b","c"] 返回值 Observable[(1, "a"), (2, "b"), (3, "c")]
+	 * 注意index从1开始
+	 */
+	public Observable<Tuple2<Integer, String>> indexable(Observable<String> observable) {
+		return observable
+				.map(p -> new Tuple2<Integer, String>(1, p))
+				.scan((p1, p2) -> new Tuple2<Integer, String>(1 + p1.getV1(), p2.getV2()));
+	}
 }
