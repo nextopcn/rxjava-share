@@ -38,7 +38,7 @@ public class Practice2 {
      */
     public Observable<Tuple2<String, Integer>> wordCount1(Observable<String> words) {
         // TODO: confused ？
-       return words.groupBy(w -> w).map(g -> g.count().map(c -> of(g.getKey(), c.intValue())).toObservable()).flatMap(e -> e);
+       return words.groupBy(w -> w).flatMap(g -> g.count().map(c -> of(g.getKey(), c.intValue())).toObservable());
     }
 
     /*
@@ -47,7 +47,7 @@ public class Practice2 {
      * 返回: Single[Map{a=2, b=1, c=2}]
      */
     public Single<Map<String, Integer>> wordCount2(Observable<String> words) {
-        return words.reduce(new HashMap<>(), (m, k) -> { m.put(k, m.containsKey(k) ? m.get(k) + 1 : 1); return m; });
+        return words.reduceWith(() -> new HashMap<>(), (m, k) -> { m.put(k, m.containsKey(k) ? m.get(k) + 1 : 1); return m; });
     }
 
 }
