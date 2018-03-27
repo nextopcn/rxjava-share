@@ -28,7 +28,7 @@ public class Practice3 {
      * 根据iterate的结果求和
      */
     public Maybe<Integer> sum(Observable<Node> observable) {
-        throw new UnsupportedOperationException("implementation");
+    	return observable.map(e->e.value).reduce((x,y)->x+y);
     }
 
     /*
@@ -42,7 +42,7 @@ public class Practice3 {
      * return Observable[4, 3, 6, 7, 5] 顺序无关
      */
     public Observable<Integer> iterate(Observable<Node> observable) {
-        throw new UnsupportedOperationException("implementation");
+    	return observable.map(e->e.value);
     }
 
     public static class Node {
