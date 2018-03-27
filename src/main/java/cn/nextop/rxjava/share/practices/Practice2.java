@@ -47,8 +47,8 @@ public class Practice2 {
      */
     public Single<Map<String, Integer>> wordCount2(Observable<String> words) {
         return words.reduceWith(() -> new HashMap<String, Integer>(), (a, b) -> {
-			if (a.containsKey(b)) a.put(b, a.get(b) + 1); else a.put(b, 1); return a;
-		});
+	    if (a.containsKey(b)) a.put(b, a.get(b) + 1); else a.put(b, 1); return a;
+	});
     }
 
 }
