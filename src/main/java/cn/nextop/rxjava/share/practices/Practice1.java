@@ -29,7 +29,9 @@ public class Practice1 {
      * 参数 Observable["a","b","c"]
      * 返回值 Observable[(1, "a"), (2, "b"), (3, "c")] 注意index从1开始
      */
-    public Observable<Tuple2<Integer, String>> indexable(Observable<String> observable) {
-        throw new UnsupportedOperationException("implementation");
+    public static Observable<Tuple2<Integer, String>> indexable(Observable<String> observable) {
+    	return observable.zipWith(Observable.range(1, Integer.MAX_VALUE), (a1,a2)->{return new Tuple2<>(a2,a1);});
     }
+    
+  
 }
