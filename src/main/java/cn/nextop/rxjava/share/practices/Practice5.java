@@ -16,11 +16,8 @@
 
 package cn.nextop.rxjava.share.practices;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Predicate;
 
 import io.reactivex.Maybe;
@@ -38,10 +35,7 @@ public class Practice5 {
      * return: Single[3]
      */
     public Single<Long> count(Observable<String> source) {
-    	AtomicLong i = new AtomicLong(0L);
-        return source.flatMap(x -> {
-        	return Observable.just(i.incrementAndGet());
-        }).lastOrError();
+    	return source.reduce(0L, (r, s) -> r + 1);
     }
 
     /*
@@ -50,9 +44,7 @@ public class Practice5 {
      * return: Observable["a", "b", "c","b", "c", "d"]
      */
     public Observable<String> convert(Observable<List<String>> source) {
-//    	return source.flatMap(list -> Observable.fromIterable(list));
     	return source.flatMap(Observable::fromIterable);
-//    	return source.flatMapIterable(x -> x);//rx java2.0
     }
     
     /*
@@ -61,13 +53,7 @@ public class Practice5 {
      * return: Observable["a", "b", "c"]
      */
     public Observable<String> distinct(Observable<String> source) {
-    	List<String> list = new ArrayList<>();
-    	return source.concatMap(x -> {
-    		if(!list.contains(x)) {
-    			list.add(x); return Observable.just(x);
-    		} 
-    		else return Observable.empty();
-    	});
+    	return source.groupBy(g -> g).map(x -> x.getKey());
     }
 
     /*
@@ -87,11 +73,7 @@ public class Practice5 {
      * return: Maybe[3]
      */
     public Maybe<String> elementAt(Observable<String> source, int index) {
-    	AtomicInteger i = new AtomicInteger(0);
-        return source.flatMap(x -> {
-        	if(i.getAndIncrement() == index) return Observable.just(x);
-        	else { return Observable.empty(); }
-        }).firstElement();
+    	return source.skip(index).firstElement();
     }
 
     /*
