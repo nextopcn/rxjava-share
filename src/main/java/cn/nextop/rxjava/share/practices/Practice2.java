@@ -36,7 +36,7 @@ public class Practice2 {
      * 返回: Observable[("a", 2), ("b", 1), ("c", 2)]
      */
     public Observable<Tuple2<String, Integer>> wordCount1(Observable<String> words) {
-    	  return words.groupBy(e -> e).flatMap(e -> e.count().map(x -> Tuples.of(e.getKey(), x.intValue())).toObservable());
+    	  return words.groupBy(e -> e).flatMap(e -> e.count().toObservable().map(x -> Tuples.of(e.getKey(), x.intValue())));
     }
 
     /*

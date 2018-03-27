@@ -23,7 +23,9 @@ import io.reactivex.Observable;
  * @author Baoyi Chen
  */
 public class Practice3 {
-
+	  public static void main(String[] args) {
+			 Observable.just(4,3,5,6,7).reduce((x,y)->x+y).subscribe(e->System.out.println(e));;
+		}
     /*
      * 根据iterate的结果求和
      */
@@ -42,7 +44,22 @@ public class Practice3 {
      * return Observable[4, 3, 6, 7, 5] 顺序无关
      */
     public Observable<Integer> iterate(Observable<Node> observable) {
-    	return observable.map(e->e.value);
+    	 Observable<Integer> ob = Observable.<Integer>create( emitter -> {
+	            observable.map( e -> {
+	                if (e.left != null) {
+	                    //left = iterate(Observable.just(e.left)).elementAt(0, Observable.just(0)).subscribe()
+	                    iterate(Observable.just(e.left)).subscribe(l -> emitter.onNext(l));
+	                }
+	                if (e.right != null) {
+	                    iterate(Observable.just(e.right)).subscribe(r -> emitter.onNext(r));
+	                }
+	                emitter.onNext(e.value);
+	                return e.value;
+	            }).subscribe();
+	            emitter.onComplete();
+	        });
+	 
+	        return ob;
     }
 
     public static class Node {
