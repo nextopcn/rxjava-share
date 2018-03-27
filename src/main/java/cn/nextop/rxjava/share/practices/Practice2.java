@@ -21,7 +21,10 @@ import cn.nextop.rxjava.share.util.type.Tuple2;
 import io.reactivex.Observable;
 import io.reactivex.Single;
 
+import java.util.HashMap;
 import java.util.Map;
+
+import static cn.nextop.rxjava.share.util.Tuples.of;
 
 /**
  * @author Baoyi Chen
@@ -34,7 +37,8 @@ public class Practice2 {
      * 返回: Observable[("a", 2), ("b", 1), ("c", 2)]
      */
     public Observable<Tuple2<String, Integer>> wordCount1(Observable<String> words) {
-        throw new UnsupportedOperationException("implementation");
+        // TODO: confused ？
+       return words.groupBy(w -> w).flatMap(g -> g.count().map(c -> of(g.getKey(), c.intValue())).toObservable());
     }
 
     /*
@@ -43,7 +47,7 @@ public class Practice2 {
      * 返回: Single[Map{a=2, b=1, c=2}]
      */
     public Single<Map<String, Integer>> wordCount2(Observable<String> words) {
-        throw new UnsupportedOperationException("implementation");
+        return words.reduceWith(() -> new HashMap<>(), (m, k) -> { m.put(k, m.containsKey(k) ? m.get(k) + 1 : 1); return m; });
     }
 
 }

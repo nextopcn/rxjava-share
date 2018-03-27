@@ -19,6 +19,9 @@ package cn.nextop.rxjava.share.practices;
 import cn.nextop.rxjava.share.util.type.Tuple2;
 import io.reactivex.Observable;
 
+import static cn.nextop.rxjava.share.util.Tuples.of;
+
+
 /**
  * @author Baoyi Chen
  */
@@ -30,6 +33,6 @@ public class Practice1 {
      * 返回值 Observable[(1, "a"), (2, "b"), (3, "c")] 注意index从1开始
      */
     public Observable<Tuple2<Integer, String>> indexable(Observable<String> observable) {
-        throw new UnsupportedOperationException("implementation");
+        return observable.map(i -> of(1, i)).scan((v1, v2) -> of(v1.getV1() + 1, v2.getV2()));
     }
 }
