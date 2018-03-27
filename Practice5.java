@@ -35,7 +35,7 @@ public class Practice5 {
      * return: Single[3]
      */
     public Single<Long> count(Observable<String> source) {
-    	return source.reduce(0L, (r, s) -> r + 1);
+        return source.reduce(0L, (r, s) -> r + 1);
     }
 
     /*
@@ -53,7 +53,7 @@ public class Practice5 {
      * return: Observable["a", "b", "c"]
      */
     public Observable<String> distinct(Observable<String> source) {
-    	return source.groupBy(g -> g).map(x -> x.getKey());
+    	return source.groupBy(g->g).map(x->x.getKey());
     }
 
     /*
@@ -73,7 +73,7 @@ public class Practice5 {
      * return: Maybe[3]
      */
     public Maybe<String> elementAt(Observable<String> source, int index) {
-    	return source.skip(index).firstElement();
+        return source.skip(index).take(1).firstElement();
     }
 
     /*
