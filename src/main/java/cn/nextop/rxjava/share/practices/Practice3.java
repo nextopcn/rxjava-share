@@ -24,14 +24,17 @@ import io.reactivex.Observable;
  */
 public class Practice3 {
 	  public static void main(String[] args) {
-			 Observable.just(4,3,5,6,7).reduce((x,y)->x+y).subscribe(e->System.out.println(e));;
+			 Observable.just(4,3,5,6,7,8).reduce((x,y)->x+y).subscribe(e->System.out.println(e));;
 		}
     /*
      * 根据iterate的结果求和
      */
-    public Maybe<Integer> sum(Observable<Node> observable) {
-    	return observable.map(e->e.value).reduce((x,y)->x+y);
-    }
+	public Maybe<Integer> sum(Observable<Node> observable) {
+		return this.iterate(observable).reduce((x, y) -> {
+			return x + y;
+		});
+
+	}
 
     /*
      * 举例:

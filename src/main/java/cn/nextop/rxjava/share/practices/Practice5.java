@@ -124,7 +124,7 @@ public class Practice5 {
      * return: Observable["a", "b", "c"], 每个元素都延迟1秒
      */
     public Observable<String> delayAll(Observable<String> source, long delay, TimeUnit unit) {
-    	return source.flatMap(e -> Observable.just(e).delay(delay, unit));
+    	return source.concatMap(e -> Observable.just(e).delay(delay, unit));
     }
 
 }

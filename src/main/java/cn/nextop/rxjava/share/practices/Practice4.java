@@ -45,7 +45,7 @@ public class Practice4 {
      *
      */
     public Observable<String> runInMultiThread(Observable<String> observable) {
-    	return observable.subscribeOn(Schedulers.newThread());
+    	return observable.concatMap(e->Observable.just(e).observeOn(Schedulers.newThread()));
     }
 
 }
