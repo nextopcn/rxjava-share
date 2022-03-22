@@ -1,0 +1,5 @@
+<root>
+  <item name='java.util.concurrent.atomic.AtomicInteger'>
+    <annotation name='android.support.annotation.NonNull' />
+  </item>
+</root>

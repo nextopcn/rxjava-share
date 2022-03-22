@@ -28,7 +28,23 @@ public class Practice3 {
      * 根据iterate的结果求和
      */
     public Maybe<Integer> sum(Observable<Node> observable) {
-        throw new UnsupportedOperationException("implementation");
+//        // Trying codes
+//        return Maybe.create( emitter -> {
+//            iterate(observable).scan((x, y) -> {
+//                return x + y;
+//            }).subscribe( e -> {
+//                System.out.println(e.toString());
+//            } );
+//            observable.last().subscribe( e -> emitter.onSuccess(e) );
+//
+//            emitter.onComplete();
+//        });
+//        iterate(observable).scan((x, y) -> {
+//            return x + y;
+//        }).subscribe(e -> {
+//            System.out.println(e.toString());
+//        });
+        return iterate(observable).scan((x, y) -> x + y).lastElement();
     }
 
     /*
@@ -42,7 +58,22 @@ public class Practice3 {
      * return Observable[4, 3, 6, 7, 5] 顺序无关
      */
     public Observable<Integer> iterate(Observable<Node> observable) {
-        throw new UnsupportedOperationException("implementation");
+        Observable<Integer> ob = Observable.<Integer>create( emitter -> {
+            observable.map( e -> {
+                if (e.left != null) {
+                    //left = iterate(Observable.just(e.left)).elementAt(0, Observable.just(0)).subscribe()
+                    iterate(Observable.just(e.left)).subscribe(l -> emitter.onNext(l));
+                }
+                if (e.right != null) {
+                    iterate(Observable.just(e.right)).subscribe(r -> emitter.onNext(r));
+                }
+                emitter.onNext(e.value);
+                return e.value;
+            }).subscribe();
+            emitter.onComplete();
+        });
+
+        return ob;
     }
 
     public static class Node {
