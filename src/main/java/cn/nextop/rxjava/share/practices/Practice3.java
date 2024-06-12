@@ -19,6 +19,9 @@ package cn.nextop.rxjava.share.practices;
 import io.reactivex.Maybe;
 import io.reactivex.Observable;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * @author Baoyi Chen
  */
@@ -28,7 +31,7 @@ public class Practice3 {
      * 根据iterate的结果求和
      */
     public Maybe<Integer> sum(Observable<Node> observable) {
-        throw new UnsupportedOperationException("implementation");
+        return this.iterate(observable).reduce((x, y) -> x + y);
     }
 
     /*
@@ -42,7 +45,10 @@ public class Practice3 {
      * return Observable[4, 3, 6, 7, 5] 顺序无关
      */
     public Observable<Integer> iterate(Observable<Node> observable) {
-        throw new UnsupportedOperationException("implementation");
+        // TODO:  直接定义一个mapper function 应该更decent
+        return observable.flatMapIterable(n -> {
+            List<Node> r = new ArrayList<>(8); this.flat(r, n); return r;
+        }).map(i -> i.value);
     }
 
     public static class Node {
@@ -55,6 +61,11 @@ public class Practice3 {
             this.right = right;
             this.value = value;
         }
+    }
+
+    protected void flat(List<Node> list, Node node) {
+        if (node == null) return;
+        list.add(node); this.flat(list, node.left); this.flat(list, node.right);
     }
 
 }
