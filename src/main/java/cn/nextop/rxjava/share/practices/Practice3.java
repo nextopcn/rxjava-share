@@ -28,7 +28,7 @@ public class Practice3 {
      * 根据iterate的结果求和
      */
     public Maybe<Integer> sum(Observable<Node> observable) {
-        throw new UnsupportedOperationException("implementation");
+        return iterate(observable).scan((a, b) -> a + b).lastElement();
     }
 
     /*
@@ -42,7 +42,11 @@ public class Practice3 {
      * return Observable[4, 3, 6, 7, 5] 顺序无关
      */
     public Observable<Integer> iterate(Observable<Node> observable) {
-        throw new UnsupportedOperationException("implementation");
+    	return observable.flatMap(x -> {
+    		Observable<Integer> o1 = (x.left == null) ? Observable.empty() : iterate(Observable.just(x.left));
+    		Observable<Integer> o2 = (x.right == null) ? Observable.empty() : iterate(Observable.just(x.right));
+    		return Observable.merge(o1, o2, Observable.just(x.value));
+    	});
     }
 
     public static class Node {
@@ -56,5 +60,4 @@ public class Practice3 {
             this.value = value;
         }
     }
-
 }
