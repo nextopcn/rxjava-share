@@ -16,13 +16,15 @@
 
 package cn.nextop.rxjava.share.practices;
 
-import io.reactivex.Maybe;
-import io.reactivex.Observable;
-import io.reactivex.Single;
-
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Predicate;
+
+import cn.nextop.rxjava.share.util.Tuples;
+import io.reactivex.Maybe;
+import io.reactivex.Observable;
+import io.reactivex.ObservableEmitter;
+import io.reactivex.Single;
 
 /**
  * @author Baoyi Chen
@@ -35,7 +37,8 @@ public class Practice5 {
      * return: Single[3]
      */
     public Single<Long> count(Observable<String> source) {
-        throw new UnsupportedOperationException("implementation");
+//    	return source.count();
+    	return source.reduce(0L, (a, b) -> a + 1);
     }
 
     /*
@@ -44,7 +47,7 @@ public class Practice5 {
      * return: Observable["a", "b", "c","b", "c", "d"]
      */
     public Observable<String> convert(Observable<List<String>> source) {
-        throw new UnsupportedOperationException("implementation");
+    	return source.flatMap(e -> Observable.fromIterable(e));
     }
 
     /*
@@ -53,7 +56,8 @@ public class Practice5 {
      * return: Observable["a", "b", "c"]
      */
     public Observable<String> distinct(Observable<String> source) {
-        throw new UnsupportedOperationException("implementation");
+//    	return source.distinct();
+    	return source.groupBy(e -> e).map(e -> e.getKey());
     }
 
     /*
@@ -62,7 +66,9 @@ public class Practice5 {
      * return: Observable[3, 4]
      */
     public Observable<Integer> filter(Observable<Integer> source, Predicate<Integer> conditon) {
-        throw new UnsupportedOperationException("implementation");
+        return source.concatMap(e -> {
+            if (conditon.test(e)) return Observable.just(e); else return Observable.<Integer>empty();
+        });
     }
 
     /*
@@ -71,7 +77,8 @@ public class Practice5 {
      * return: Maybe[3]
      */
     public Maybe<String> elementAt(Observable<String> source, int index) {
-        throw new UnsupportedOperationException("implementation");
+//    	return source.elementAt(index);
+    	return source.zipWith(Observable.range(0, Integer.MAX_VALUE), (a, b) -> Tuples.of(a, b)).filter(x -> x.getV2() == index).map(e -> e.getV1()).firstElement();
     }
 
     /*
@@ -80,7 +87,8 @@ public class Practice5 {
      * return: Observable["a", "b", "a", "b"]
      */
     public Observable<String> repeat(Observable<String> source, int count) {
-        throw new UnsupportedOperationException("implementation");
+//    	return source.repeat(count);
+    	return Observable.range(0, count).concatMap(e -> source);
     }
 
     /*
@@ -89,16 +97,27 @@ public class Practice5 {
      * return: Observable["a", "b"]
      */
     public Observable<String> concat(List<Observable<String>> source) {
-        throw new UnsupportedOperationException("implementation");
+//    	return Observable.concat(source);
+    	return Observable.create(emitter -> { concat(source, emitter); });
     }
-
+    private void concat(List<Observable<String>> source, ObservableEmitter<String> emitter) {
+        if (source.isEmpty()) {
+            emitter.onComplete();
+        } else {
+            source.get(0).subscribe(e -> {
+                emitter.onNext(e);
+            }, e -> emitter.onError(e), () -> {
+                concat(source.subList(1, source.size()), emitter);
+            });
+        }
+    }
     /*
      * example:
      * param: Observable["a"], Observable["b"]
      * return: Observable["a", "b"]
      */
     public Observable<String> merge(List<Observable<String>> source) {
-        throw new UnsupportedOperationException("implementation");
+    	return Observable.fromIterable(source).flatMap(e -> e);
     }
 
     /*
@@ -107,7 +126,8 @@ public class Practice5 {
      * return: Observable["a", "b", "c"], 每个元素都延迟1秒
      */
     public Observable<String> delayAll(Observable<String> source, long delay, TimeUnit unit) {
-        throw new UnsupportedOperationException("implementation");
+//    	return source.delay(delay, unit);
+    	return source.concatMap(e -> Observable.just(e).delay(delay, unit));
     }
 
 }
