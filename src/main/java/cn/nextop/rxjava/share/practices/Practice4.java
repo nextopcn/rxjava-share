@@ -18,7 +18,7 @@ package cn.nextop.rxjava.share.practices;
 
 
 import io.reactivex.Observable;
-
+import io.reactivex.schedulers.Schedulers;
 
 /**
  * @author Baoyi Chen
@@ -44,7 +44,10 @@ public class Practice4 {
      *
      */
     public Observable<String> runInMultiThread(Observable<String> observable) {
-        throw new UnsupportedOperationException("implementation");
+    	return observable.map(s -> {
+    		return Observable.just(s).observeOn(Schedulers.io());
+    	}).concatMap(e -> e);
+    	
     }
 
 }
