@@ -17,11 +17,14 @@
 package cn.nextop.rxjava.share.practices;
 
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.Callable;
+
 import cn.nextop.rxjava.share.util.type.Tuple2;
 import io.reactivex.Observable;
 import io.reactivex.Single;
-
-import java.util.Map;
+import io.reactivex.functions.BiFunction;
 
 /**
  * @author Baoyi Chen
@@ -34,7 +37,9 @@ public class Practice2 {
      * 返回: Observable[("a", 2), ("b", 1), ("c", 2)]
      */
     public Observable<Tuple2<String, Integer>> wordCount1(Observable<String> words) {
-        throw new UnsupportedOperationException("implementation");
+    	return words.groupBy(key -> key).map(group -> {
+			return group.count().map(c -> new Tuple2<String, Integer>(group.getKey(), c.intValue())).toObservable();
+		}).flatMap(f -> f);
     }
 
     /*
@@ -43,7 +48,16 @@ public class Practice2 {
      * 返回: Single[Map{a=2, b=1, c=2}]
      */
     public Single<Map<String, Integer>> wordCount2(Observable<String> words) {
-        throw new UnsupportedOperationException("implementation");
+    	return words.reduceWith(new Callable<Map<String, Integer>>() {
+    		@Override
+    		public Map<String, Integer> call() throws Exception {
+    			return new HashMap<String, Integer>();
+    		}
+		}, new BiFunction<Map<String, Integer>, String, Map<String, Integer>>() {
+			@Override
+			public Map<String, Integer> apply(Map<String, Integer> t1, String t2) throws Exception {
+				Integer c = t1.get(t2); if(c == null) c = 0; t1.put(t2, c++); return t1;
+			}
+		});
     }
-
 }
