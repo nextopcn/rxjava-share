@@ -19,6 +19,10 @@ package cn.nextop.rxjava.share.practices;
 import cn.nextop.rxjava.share.util.type.Tuple2;
 import io.reactivex.Observable;
 
+import static cn.nextop.rxjava.share.util.Tuples.of;
+import static io.reactivex.Observable.range;
+import static java.lang.Integer.MAX_VALUE;
+
 /**
  * @author Baoyi Chen
  */
@@ -29,7 +33,7 @@ public class Practice1 {
      * 参数 Observable["a","b","c"]
      * 返回值 Observable[(1, "a"), (2, "b"), (3, "c")] 注意index从1开始
      */
-    public Observable<Tuple2<Integer, String>> indexable(Observable<String> observable) {
-        throw new UnsupportedOperationException("implementation");
+    public Observable<Tuple2<Integer, String>> indexable(Observable<String> ob) {
+        return ob.zipWith(range(1, MAX_VALUE), (i, s) -> of(s, i));
     }
 }
